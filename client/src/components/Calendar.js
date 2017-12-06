@@ -6,6 +6,7 @@ import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
 import $ from 'jquery';
 const btn_style = { backgroundColor: '#0F3E86' };
+const cal_margin = { margin: '0px 10px' };
 
 BigCalendar.momentLocalizer(moment);
 
@@ -19,9 +20,17 @@ const EventView = props => {
               <span className="card-title">
                 {'Event title: ' + props.event.title}
               </span>
+              <p>
+                {'Start Time: ' +
+                  moment(props.event.start).format('MM/DD/YYYY h:mm a')}
+              </p>
+              <p>
+                {'End Time: ' +
+                  moment(props.event.end).format('MM/DD/YYYY h:mm a')}
+              </p>
               <p>{'Number of attendees: ' + props.event.attendees}</p>
             </div>
-            <div className="card-action">
+            <div className="card-action" style={{ display: 'flex' }}>
               {props.event.attendees === undefined ? (
                 ''
               ) : (
@@ -30,7 +39,7 @@ const EventView = props => {
                   // onClick={() => props.delete(props.event._id)}
                   onClick={() => props.delete(props.event)}
                 >
-                  Delete
+                  Leave
                 </button>
               )}
               <button
@@ -110,34 +119,12 @@ class Calendar extends Component {
         </div>
       </div>
     );
-
-    // return (
-    //   <div id="mycalendar">
-    //     <BigCalendar
-    //       onSelectEvent={this.onSelectEvent.bind(this)}
-    //       style={{ height: '90vh' }}
-    //       events={this.props.events}
-    //       startAccessor="start"
-    //       endAccessor="end"
-    //     />
-    //     <div className="fixed-action-btn">
-    //       <Link
-    //         to="/calendar/new"
-    //         className="btn-floating btn-large"
-    //         style={btn_style}
-    //       >
-    //         <i className="material-icons">add</i>
-    //       </Link>
-    //     </div>
-    //     {this.state.selectedevent ? <EventView {...eventprops} /> : null}
-    //   </div>
-    // );
   }
 }
 
 const MyCal = props => {
   return (
-    <div id="mycalendar">
+    <div id="mycalendar" style={cal_margin}>
       <BigCalendar
         events={props.events}
         style={{ height: '90vh' }}

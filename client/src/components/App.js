@@ -15,16 +15,16 @@ class App extends Component {
 
   render() {
     return (
-      <div className="container">
-        <BrowserRouter>
-          <div>
-            <Header />
-            <Route exact path="/" component={Landing} />
-            <Route exact path="/calendar" component={Calendar} />
+      <BrowserRouter>
+        <div className="maincontainer">
+          <Header />
+          <Route exact path="/" component={Landing} />
+          <Route exact path="/calendar" component={Calendar} />
+          <div className="container">
             <Route path="/calendar/new" component={EventNew} />
           </div>
-        </BrowserRouter>
-      </div>
+        </div>
+      </BrowserRouter>
     );
   }
 }

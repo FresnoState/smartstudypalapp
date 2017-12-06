@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const navColor = { backgroundColor: '#0F3E86', borderRadius: '10px' };
+const navColor = {
+  backgroundColor: '#0F3E86'
+  // borderTopLeftRadius: '10px',
+  // borderTopRightRadius: '10px'
+};
 
 class Header extends Component {
   renderContent() {
