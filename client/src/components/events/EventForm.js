@@ -6,7 +6,8 @@ import * as actions from '../../actions';
 import moment from 'moment';
 const btndivStyle = {
   display: 'flex',
-  justifyContent: 'space-between'
+  justifyContent: 'space-between',
+  flexWrap: 'wrap'
 };
 const labelStyle = {
   fontSize: '1.2rem',
