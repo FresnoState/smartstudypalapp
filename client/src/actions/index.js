@@ -15,8 +15,13 @@ export const fetchEvents = () => async dispatch => {
 
 export const submitEvent = (values, history) => async dispatch => {
   const res = await axios.post('/api/events', values);
-  history.push('/calendar');
-  dispatch({ type: FETCH_EVENTS, payload: res.data });
+  console.log('res data is', res.data);
+  if (res.data === 'error') {
+    return [];
+  } else {
+    history.push('/calendar');
+    dispatch({ type: FETCH_EVENTS, payload: res.data });
+  }
 };
 
 export const joinEvent = (values, history) => async dispatch => {

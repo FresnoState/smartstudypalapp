@@ -96,7 +96,7 @@ module.exports = app => {
     res.send(res.user);
   });
 
-  app.post('/api/events', requireLogin, (req, res, done) => {
+  app.post('/api/events', requireLogin, async (req, res, done) => {
     var eventBody = req.body;
     var userBody = req.user;
     var studyevent = {
@@ -108,31 +108,49 @@ module.exports = app => {
       attendees: [req.user._id]
     };
 
-    Calendar.findOne({
-      courseID: eventBody.classid
-    }).then(existingCal => {
-      if (existingCal) {
-        console.log('found cal');
-        checkstudy(studyevent, eventBody, userBody);
-        done(null, existingCal);
-      } else {
-        console.log('new cal');
-        new Calendar({
-          courseID: eventBody.classid,
-          openstudy: [studyevent]
-        })
-          .save(function(err) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-          })
-          .then(cal => {
-            done(null, cal);
-          });
+    const matchEvents = await Calendar.find({
+      openstudy: {
+        $elemMatch: {
+          attendees: { $in: [userBody._id] },
+          start: {
+            $lte: new Date(eventBody.date + ' ' + eventBody.end)
+          },
+          end: {
+            $gte: new Date(eventBody.date + ' ' + eventBody.start)
+          }
+        }
       }
     });
 
+    if (matchEvents.length > 0) {
+      console.log('event already within that time');
+      res.send('error');
+    } else {
+      Calendar.findOne({
+        courseID: eventBody.classid
+      }).then(existingCal => {
+        if (existingCal) {
+          console.log('found cal');
+          checkstudy(studyevent, eventBody, userBody);
+          done(null, existingCal);
+        } else {
+          console.log('new cal');
+          new Calendar({
+            courseID: eventBody.classid,
+            openstudy: [studyevent]
+          })
+            .save(function(err) {
+              if (err) {
+                console.log(err);
+                return;
+              }
+            })
+            .then(cal => {
+              done(null, cal);
+            });
+        }
+      });
+    }
     res.send(res.user);
   });
 

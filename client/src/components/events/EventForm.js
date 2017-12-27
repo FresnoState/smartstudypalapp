@@ -4,6 +4,8 @@ import { reduxForm, Field } from 'redux-form';
 import { Link, withRouter } from 'react-router-dom';
 import * as actions from '../../actions';
 import moment from 'moment';
+import DropdownList from 'react-widgets/lib/DropdownList';
+import 'react-widgets/dist/css/react-widgets.css';
 const btndivStyle = {
   display: 'flex',
   justifyContent: 'space-between',
@@ -12,6 +14,60 @@ const btndivStyle = {
 const labelStyle = {
   fontSize: '1.2rem',
   color: '#999'
+};
+const margbottom = {
+  margin: '0 0 20px 0'
+};
+
+const eventView = {
+  position: 'absolute',
+  zIndex: '7',
+  top: '25%',
+  left: '33%',
+  width: '70%'
+};
+
+//Nees to be updated to dynamically pull users schedule
+const classIDS = [
+  { class: 'CSCI 119', value: '119' },
+  { class: 'CSCI 117', value: '117' },
+  { class: 'CSCI 172', value: '172' }
+];
+
+const renderDropdownList = ({ input, data, valueField, textField }) => (
+  <DropdownList
+    {...input}
+    data={data}
+    valueField={valueField}
+    textField={textField}
+    onChange={input.onChange}
+  />
+);
+
+const ErrorMessage = props => {
+  console.log('ErrorMessage props are: ', props);
+  return (
+    <div style={eventView} id="event-view">
+      <div className="row">
+        <div className="col s12 m6">
+          <div className="card blue-grey darken-1">
+            <div className="card-content white-text">
+              <span className="card-title">Error:</span>
+              <p>You already have a study session during this time.</p>
+            </div>
+            <div className="card-action">
+              <button
+                className="waves-effect waves-light btn"
+                onClick={props.closeErrorView}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 class EventForm extends Component {
@@ -43,8 +99,17 @@ class EventForm extends Component {
     });
   }
   updateClassIDValue(evt) {
+    // console.log(evt.target.value);
+    // console.log(evt.value);
     this.setState({
-      classid: evt.target.value
+      classid: evt.value
+    });
+  }
+
+  handleDisplay() {
+    console.log(this.state);
+    this.setState({
+      isHidden: !this.state.isHidden
     });
   }
 
@@ -111,11 +176,21 @@ class EventForm extends Component {
   }
 
   render() {
+    var closeViewprop = {
+      closeErrorView: this.handleDisplay.bind(this)
+    };
     return (
       <div>
         <form
           onSubmit={this.props.handleSubmit(values =>
-            this.props.submitEvent(values, this.props.history)
+            this.props.submitEvent(values, this.props.history).then(val => {
+              console.log('test this');
+              if (val.length === 0) {
+                this.setState({
+                  isHidden: !this.state.isHidden
+                });
+              }
+            })
           )}
         >
           <label style={labelStyle}>Study Date:</label>
@@ -141,13 +216,17 @@ class EventForm extends Component {
           />
           <label style={labelStyle}>Event Title:</label>
           <Field type="text" name="event" component="input" />
-          <label style={labelStyle}>Class ID:</label>
-          <Field
-            type="text"
-            name="classid"
-            component="input"
-            onChange={evt => this.updateClassIDValue(evt)}
-          />
+          <div style={margbottom}>
+            <label style={labelStyle}>Class ID:</label>
+            <Field
+              name="favoriteColor"
+              component={renderDropdownList}
+              data={classIDS}
+              valueField="value"
+              textField="class"
+              onChange={evt => this.updateClassIDValue(evt)}
+            />
+          </div>
           <div style={btndivStyle}>
             <div>
               <Link to="/calendar" className="red btn-flat white-text">
@@ -177,6 +256,8 @@ class EventForm extends Component {
         this.state.classid !== ''
           ? this.renderMatchedEvents(this.props)
           : null}
+
+        {this.state.isHidden && <ErrorMessage {...closeViewprop} />}
       </div>
     );
   }
